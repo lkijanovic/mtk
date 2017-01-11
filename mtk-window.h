@@ -11,6 +11,6 @@ typedef struct mtk_window {
 } mtk_window;
 
 mtk_window *mtk_create_window();
-void mtk_draw_window(mtk_window *win);
+void mtk_draw_window(mtk_window *mtk_win);
 
 #endif
