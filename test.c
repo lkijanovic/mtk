@@ -9,8 +9,8 @@ int main(int argc, char **argv) {
 	/* initialize mtk library */
 	mtk_init();
 	
-	mtk_window *win = mtk_create_window();
-	mtk_draw_window(win);
+	mtk_window *win = mtk_window_create();
+	mtk_window_draw(win);
 	
 	pause();
 	

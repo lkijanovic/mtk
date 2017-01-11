@@ -10,7 +10,7 @@ typedef struct mtk_window {
 	xcb_window_t xcb_win;
 } mtk_window;
 
-mtk_window *mtk_create_window();
-void mtk_draw_window(mtk_window *mtk_win);
+mtk_window *mtk_window_create();
+void mtk_window_draw(mtk_window *mtk_win);
 
 #endif
