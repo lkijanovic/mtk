@@ -6,8 +6,9 @@
 
 extern mtk_data *data;
 
-mtk_window *mtk_window_create() {
-	
+mtk_window *mtk_window_create()
+{
+
 	mtk_window *mtk_win;
 
 	xcb_connection_t *conn;
@@ -41,12 +42,13 @@ mtk_window *mtk_window_create() {
 				win_values);
 
 	mtk_win->xcb_win = win;
-	
+
 }
 
 
-void mtk_window_draw(mtk_window *mtk_win) {
-	
+void mtk_window_draw(mtk_window *mtk_win)
+{
+
 	xcb_map_window(data->xcb_conn, mtk_win->xcb_win);
 	xcb_flush(data->xcb_conn);
 }

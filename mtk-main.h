@@ -4,11 +4,11 @@
 #include <xcb/xcb.h>
 
 
-// contains all MTK internal data  
-typedef struct mtk_data {
+// contains all MTK internal data
+typedef struct mtk_data_t {
 	xcb_connection_t *xcb_conn;
-	
-} mtk_data;
+	mtk_typetable_t *table;
+} mtk_data_t;
 
 
 

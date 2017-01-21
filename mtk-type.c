@@ -1,73 +1,166 @@
 #include <stdlib.h>
 #include <string.h>
 
-
 #include "mtk-type.h"
 
-#define MTK_TYPE_TABLE_INIT_SIZE 50
 
-mtk_type_table_t *mtk_type_table_create()
+
+#define MTK_TYPETABLE_INIT_SIZE 50
+
+
+
+/* 
+ * Creates new type from name and id and returns pointer to it.
+ * Returns NULL on error.
+ */
+mtk_type_t *mtk_type_create(const char *name, int id)
 {
 
-	mtk_type_table_t *table;
-	
-	/* create empty table */
-	table = malloc(sizeof(mtk_type_table_t));
-	table->size = MTK_TYPE_TABLE_INIT_SIZE;
-	table->count = 0;
-	table->entries = NULL;
-	table->next_id = 0;
-	
-	return table;
-	
+	mtk_type_t *type = NULL;
+
+	/* create new type */
+	type = malloc(sizeof(mtk_type_t));
+	if(type == NULL)
+		goto out;
+	type->name = strdup(name);
+	if(type->name == NULL)
+		goto out;
+	type->id = id;
+
+	return type;
+
+out:
+	free(type);
+	return NULL;
+
 }
 
-void mtk_type_table_add_entry(mtk_type_table_t *table, char *type_name)
+/* 
+ * Frees type and its resources.
+ */
+void mtk_type_destroy(mtk_type_t *type) {
+
+	free(type->name);
+	type->name = NULL;
+
+}
+
+/* 
+ * Creates empty type table and returns pointer to it.
+ * Returns NULL on error.
+ */
+mtk_typetable_t *mtk_typetable_create()
 {
+
+	mtk_typetable_t *table = NULL;
+
+	table = malloc(sizeof(mtk_typetable_t));
+	if(table == NULL)
+		goto out;
+
+	table->types = malloc(MTK_TYPETABLE_INIT_SIZE * sizeof(mtk_type_t *));
+	if(table->types == NULL)
+		goto out;
+	table->size = MTK_TYPETABLE_INIT_SIZE;
+	table->count = 0;
+	table->next_id = 0;
+
+	return table;
+
+
+out:
+	free(table);
+	return NULL;
+
+}
+
+
+/* 
+ * Frees type table and its resources.
+ */
+void mtk_typetable_destroy(mtk_typetable_t *table) {
 	
-	mtk_type_t *entry;
-	
+	if(table == NULL)
+		return;
+	if(table->types == NULL)
+		return;
+
+	for(int i = 0; i < table->count; i++) {
+		mtk_type_destroy(table->types[i]);
+		table->types[i] = NULL;
+	}
+
+	free(table->types);
+	free(table);
+
+}
+
+/*
+ * Inserts new type in type table, and returns 1 on success.
+ * Returns 0 on failure without modifying table.
+ */
+int mtk_typetable_insert(mtk_typetable_t *table, const char *name)
+{
+
+	mtk_type_t *type = NULL;
+
+	/* check if type already exists */
+	if(mtk_typetable_search_name(table, name) != -1)
+		goto out;
+
 	/* do reallocations if necessary */
 	if(table->count == table->size) {
-		table->size = table->size * 2;
-		table->entries = realloc(table->entries, table->size);
+		mtk_type_t **ntypes;
+		int nsize = table->size * 2;
+
+		ntypes = realloc(table->types, nsize * sizeof(mtk_type_t *));
+		if(ntypes == NULL)
+			goto out;
+
+		table->size = nsize;
+		table->types = ntypes;
 	}
-	
+
 	/* create new type */
-	entry = mtk_type_create(type_name, table->next_id);
-	table->next_id += 1;
-	
-	/* insert type */
-	table->entries[table->count] = entry;
+	type = mtk_type_create(name, table->count);
+	if(type == NULL)
+		goto out;
+
+	/* insert type to the end of the type table */
+	table->types[table->count] = type;
 	table->count += 1;
-	
-	/* make sure table is sorted */
-	for(int i = table->count - 2; i >= 0; i--) {
-		int cmp = strcmp(table->entries[i]->type_name, 
-			table->entries[i+1]->type_name);
-			
-		if(cmp > 0) {
-			mtk_type_t *t = table->entries[i];
-			table->entries[i] = table->entries[i+1];
-			table->entries[i+1] = t;
-		} else {
-			break;
-		}
-		
-		/* TODO: error-checking for multiple types with same name */
-	}
+
+	return 1;
+
+
+out:
+	return 0;
+
 }
 
-
-mtk_type_t *mtk_type_create(char *type_name, unsigned type_id)
+/* 
+ * Searches type table by type name and returns type id. 
+ * Returns -1 if there are no matches.
+ */
+int mtk_typetable_search_name(mtk_typetable_t *table, const char *name) 
 {
 
-	mtk_type_t *entry;
-	
-	/* create new widget */
-	entry = malloc(sizeof(mtk_type_t));
-	entry->type_name = type_name;
-	entry->type_id = type_id;
-	
-	return entry;
+	for(int i = 0; i < table->count; i++) {
+		if(strcmp(table->types[i]->name, name) == 0)
+			return i;
+	}
+
+	return -1;
+
+}
+
+/* Searches type table by type id and returns type name. 
+ * Returns NULL if there are no matches.
+ */
+const char *mtk_typetable_search_id(mtk_typetable_t *table, int id)
+{
+	if(id >= table->count)
+		return NULL;
+
+	return table->types[id]->name;
 }

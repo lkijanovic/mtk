@@ -3,39 +3,58 @@
 #include "mtk-main.h"
 
 
-// contains all MTK internal data  
-mtk_data *data = NULL;
+// contains all MTK internal data
+mtk_data_t *data = NULL;
 
-int mtk_init() {
+int mtk_init()
+{
 
-	xcb_connection_t *conn;
+	xcb_connection_t *conn = NULL;
 
 	/* don't initialize twice */
 	if(data != NULL)
-		return 0;
+		goto outA;
 
-	/* open connection to X server */	
+	/* open connection to X server */
 	conn = xcb_connect(NULL, NULL);
 	if(xcb_connection_has_error(conn))
-		return 0;
+		goto outA;
 
 	/* allocate mtk_data */
-	data = malloc(sizeof(mtk_data));
-	if(data == NULL) {
-		xcb_disconnect(conn);
-		return 0;
-	}
+	data = malloc(sizeof(mtk_data_t));
+	if(data == NULL)
+		goto outA;
+
+	/* populate type table with basic types */
+	data->table = mtk_typetable_create();
+	if(data->table == NULL)
+		goto outA;
+
+	if(mtk_typetable_insert(data->table, "mtk_blank"))
+		goto outB;
+	if(mtk_typetable_insert(data->table, "mtk_window"))
+		goto outB;
 
 	/* return 1 on success */
 	data->xcb_conn = conn;
-	return 1;	
-	
+	return 1;
+
+
+outB:
+	mtk_typetable_destroy(data->table);
+outA:
+	free(data);
+	data = NULL;
+	xcb_disconnect(conn);
+	return NULL;
 }
 
-void mtk_exit() {
-	
+void mtk_exit()
+{
+
 	/* disconnect from X server and free allocated data */
 	xcb_disconnect(data->xcb_conn);
+	mtk_typetable_destory(data->table);
 	free(data);
 	data = NULL;
 }
