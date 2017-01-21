@@ -8,7 +8,7 @@
 // contains all MTK internal data
 typedef struct mtk_data_t {
 	xcb_connection_t *xcb_conn;
-	mtk_typetable_t *table;
+	mtk_type_list_t *table;
 } mtk_data_t;
 
 

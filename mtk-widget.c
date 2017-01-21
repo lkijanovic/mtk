@@ -1,31 +1,74 @@
+#include <stdlib.h>
+#include <string.h>
+
 #include "mtk-widget.h"
 
+mtk_property_t *mtk_property_create(char *name, mtk_property_type_t type, 
+					void *value, int size)
+{
+	mtk_property_t *res;
+	
+	res = malloc(sizeof(mtk_property_t));
+	if(res == NULL)
+		goto outA;
+		
+	res->name = strdup(name);
+	if(res->name == NULL)
+		goto outB;
+		
+	res->value = malloc(size);
+	if(res->value == NULL)
+		goto outC;
+	memcpy(res->value, value, size);
 
-/*
- * Widget property.
- */
-typedef struct mtk_widget_property_t {
+	res->type = type;
+	res->size = size;
+	
+outC:
+	free(res->name);
+outB:
+	free(res);
+outA:
+	return NULL;
+}
 
-} mtk_widget_property_t;
+void mtk_property_destroy(mtk_property_t *property)
+{
+	if(property == NULL)
+		return;
+		
+	free(property->name);
+	free(property->value);
+	free(property);
+}
 
-/*
- * Widget event.
- */
-typedef struct mtk_widget_event_t {
+mtk_event_t *mtk_event_create(char *name, void (*callback)(void *data))
+{
+	mtk_event_t *res;
+	
+	res = malloc(sizeof(mtk_event_t));
+	if(res == NULL)
+		goto outA;
+		
+	res->name = strdup(name);
+	if(res->name == NULL)
+		goto outB;
 
-} mtk_widget_event_t;
+	res->callback = callback;
+	
+	return res;
 
+outB:
+	free(res);
+outA:
+	return NULL;
+}
 
-/*
- * Basic widget structure.
- */
-typedef struct mtk_widget_t {
-	int id;
-	int class_id;
-	mtk_widget_property_t *properties;
-	mtk_widget_event_t *events;
-	struct mtk_widget_t *parent;
-	struct mtk_widget_t **children;
-	int children_count;
-	int children_size;
-} mtk_widget_t;
+void mtk_event_destroy(mtk_event_t *event)
+{
+	if(event == NULL)
+		return;
+	
+	free(event->name);
+	free(event);
+}

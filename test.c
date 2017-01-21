@@ -4,6 +4,8 @@
 #include "mtk-main.h"
 #include "mtk-window.h"
 
+extern mtk_data_t *data;
+
 int main(int argc, char **argv)
 {
 
@@ -13,10 +15,10 @@ int main(int argc, char **argv)
 		exit(1);
 
 	mtk_window *win = mtk_window_create();
-	if(win == 0)
+	if(win == NULL)
 		exit(1);
-	mtk_window_draw(win);
 
+	mtk_window_draw(win);
 	pause();
 
 	mtk_exit();
