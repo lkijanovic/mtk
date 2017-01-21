@@ -3,6 +3,7 @@
 
 #include <xcb/xcb.h>
 
+#include "mtk-type.h"
 
 // contains all MTK internal data
 typedef struct mtk_data_t {

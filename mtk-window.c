@@ -4,7 +4,7 @@
 #include <stdlib.h>
 #include <xcb/xcb.h>
 
-extern mtk_data *data;
+extern mtk_data_t *data;
 
 mtk_window *mtk_window_create()
 {
@@ -13,7 +13,6 @@ mtk_window *mtk_window_create()
 
 	xcb_connection_t *conn;
 	xcb_screen_t *screen;
-	xcb_screen_iterator_t screen_iter;
 	xcb_window_t win;
 	unsigned win_mask;
 	unsigned win_values[1];
@@ -43,6 +42,7 @@ mtk_window *mtk_window_create()
 
 	mtk_win->xcb_win = win;
 
+	return mtk_win;
 }
 
 

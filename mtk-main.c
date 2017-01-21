@@ -29,7 +29,6 @@ int mtk_init()
 	data->table = mtk_typetable_create();
 	if(data->table == NULL)
 		goto outA;
-
 	if(mtk_typetable_insert(data->table, "mtk_blank"))
 		goto outB;
 	if(mtk_typetable_insert(data->table, "mtk_window"))
@@ -46,7 +45,7 @@ outA:
 	free(data);
 	data = NULL;
 	xcb_disconnect(conn);
-	return NULL;
+	return 0;
 }
 
 void mtk_exit()
@@ -54,7 +53,7 @@ void mtk_exit()
 
 	/* disconnect from X server and free allocated data */
 	xcb_disconnect(data->xcb_conn);
-	mtk_typetable_destory(data->table);
+	mtk_typetable_destroy(data->table);
 	free(data);
 	data = NULL;
 }
