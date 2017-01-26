@@ -3,7 +3,8 @@
 #include "mtk-main.h"
 #include "mtk-type.h"
 
-int mtk_init_table();
+int mtk_init_list();
+int mtk_type_register(const char *name);
 
 // contains all MTK internal data
 mtk_data_t *data = NULL;
@@ -29,8 +30,8 @@ int mtk_init()
 		
 	data->xcb_conn = conn;
 
-	/* populate type table with basic types */
-	if(mtk_init_table() == 0)
+	/* populate type list with basic types */
+	if(mtk_init_list() == 0)
 		goto outC;
 
 	/* return 1 on success */
@@ -55,44 +56,52 @@ void mtk_exit()
 
 	/* disconnect from X server and free allocated data */
 	xcb_disconnect(data->xcb_conn);
-	mtk_list_destroy(data->table);
+	mtk_list_destroy(data->list);
 	free(data);
 	data = NULL;
 	
 }
 
-int mtk_init_table()
+int mtk_init_list()
 {
 	
-	mtk_type_t *type;
-	
-	data->table = mtk_list_create_ext(sizeof(mtk_type_t), mtk_type_copy,
+	data->list = mtk_list_create_ext(sizeof(mtk_type_t), mtk_type_copy,
 		mtk_type_destroy);
-	if(data->table == NULL)
+	if(data->list == NULL)
 		goto outA;
 	
-	type = mtk_type_create("mtk_blank", 0);
-	if(type == NULL)
+	if(mtk_type_register("mtk_blank") == 0)
 		goto outB;
-	if(mtk_list_insert(data->table, type) == 0)
-		goto outC;
-	mtk_type_destroy(type);
-	
-	type = mtk_type_create("mtk_window", 1);
-	if(type == NULL)
+	if(mtk_type_register("mtk_window") == 0)
 		goto outB;
-	if(mtk_list_insert(data->table, type) == 0)
-		goto outC;
-	mtk_type_destroy(type);
 		
 	return 1;
-	
 
-outC:
-	mtk_type_destroy(type);
+
 outB:
-	mtk_list_destroy(data->table);
-	data->table = NULL;
+	mtk_list_destroy(data->list);
+	data->list = NULL;
+outA:
+	return 0;
+	
+}
+
+int mtk_type_register(const char *name)
+{
+	mtk_type_t *type;
+	
+	type = mtk_type_create(name);
+	if(type == NULL)
+		goto outA;
+	if(mtk_list_insert(data->list, type) == 0)
+		goto outB;
+	mtk_type_destroy(type);
+	
+	return 1;
+	
+	
+outB:
+	mtk_type_destroy(type);
 outA:
 	return 0;
 	

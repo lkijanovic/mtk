@@ -8,9 +8,9 @@
  * Creates new type from given name and id and returns pointer to it.
  * Returns NULL on error.
  */
-mtk_type_t *mtk_type_create(const char *name, int id)
+mtk_type_t *mtk_type_create(const char *name)
 {
-
+	static int id = 0;
 	mtk_type_t *type;
 
 	type = malloc(sizeof(mtk_type_t));
@@ -20,6 +20,7 @@ mtk_type_t *mtk_type_create(const char *name, int id)
 	if(type->name == NULL)
 		goto outB;
 	type->id = id;
+	id++;
 
 	return type;
 

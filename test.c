@@ -1,4 +1,5 @@
 #include <stdlib.h>
+#include <stdio.h>
 #include <xcb/xcb.h>
 
 #include "mtk-main.h"
@@ -22,7 +23,7 @@ int main(int argc, char **argv)
 	mtk_window_draw(win);*/
 
 	mtk_list_elem_t *elem;
-	for(elem = data->table->first; elem != NULL; elem = elem->next) {
+	for(elem = data->list->first; elem != NULL; elem = elem->next) {
 		mtk_type_t *type = (mtk_type_t *)elem->data;
 		printf("%s:%i\n", type->name, type->id);
 	}
