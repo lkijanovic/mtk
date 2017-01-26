@@ -3,12 +3,12 @@
 
 #include <xcb/xcb.h>
 
-#include "mtk-type.h"
+#include "mtk-list.h"
 
 // contains all MTK internal data
 typedef struct mtk_data_t {
 	xcb_connection_t *xcb_conn;
-	mtk_type_list_t *table;
+	mtk_list_t *table;
 } mtk_data_t;
 
 
