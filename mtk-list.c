@@ -3,18 +3,18 @@
 
 #include "mtk-list.h"
 
-mtk_list_elem_t *mtk_list_elem_create(mtk_list_t *list, const void *data)
+mtk_list_elem_t *mtk_list_elem_create(const mtk_list_t *list, const void *data)
 {
 
-	mtk_list_elem_t *res;
+	mtk_list_elem_t *res = NULL;
 	
 	res = malloc(sizeof(mtk_list_elem_t));
 	if(res == NULL)
-		goto outA;
+		goto out;
 	
 	res->data = malloc(list->data_size);
 	if(res->data == NULL)
-		goto outB;
+		goto out;
 
 	if(list->copy != NULL)
 		list->copy(res->data, data);
@@ -25,14 +25,13 @@ mtk_list_elem_t *mtk_list_elem_create(mtk_list_t *list, const void *data)
 	return res;
 
 	
-outB:
+out:
 	free(res);
-outA:
 	return NULL;
 
 }
 
-void mtk_list_elem_destroy(mtk_list_t *list, mtk_list_elem_t *elem)
+void mtk_list_elem_destroy(const mtk_list_t *list, mtk_list_elem_t *elem)
 {
 
 	if(elem == NULL)
@@ -45,6 +44,7 @@ void mtk_list_elem_destroy(mtk_list_t *list, mtk_list_elem_t *elem)
 
 	free(elem);
 }
+
 
 mtk_list_t *mtk_list_create(unsigned data_size)
 {
@@ -78,6 +78,9 @@ void mtk_list_destroy(mtk_list_t *list)
 
 	mtk_list_elem_t *elem, *t;
 	
+	if(list == NULL)
+		return;
+	
 	elem = list->first;
 	while(elem != NULL) {
 		t = elem;
@@ -97,7 +100,7 @@ int mtk_list_insert(mtk_list_t *list, const void *data)
 	
 	elem = mtk_list_elem_create(list, data);
 	if(elem == NULL)
-		goto out;
+		return 0;
 		
 	if(list->first == NULL)
 		list->first = list->last = elem;
@@ -106,9 +109,6 @@ int mtk_list_insert(mtk_list_t *list, const void *data)
 		
 	return 1;
 	
-	
-out:
-	return 0;
 	
 }
 
@@ -133,4 +133,30 @@ const void *mtk_list_search(mtk_list_t *list, const void *data,
 	
 	return NULL;
 	
+}
+
+mtk_list_t *mtk_list_copy(const mtk_list_t *list)
+{
+
+	mtk_list_t *res = NULL;
+	mtk_list_elem_t *elem;
+	
+	if(list == NULL)
+		goto out;
+	
+	res = mtk_list_create_ext(list->data_size, list->copy, list->destroy);
+	if(res == NULL)
+		goto out;
+	
+	for(elem = list->first; elem != NULL; elem = elem->next) {
+		if(!mtk_list_insert(res, elem->data))
+			goto out;
+	}
+	
+	return res;
+	
+	
+out:
+	mtk_list_destroy(res);
+	return NULL;
 }

@@ -1,40 +1,70 @@
+#include <stdlib.h>
+#include <string.h>
+
 #include "mtk-property.h"
 
-mtk_property_t *mtk_property_create(char *name, mtk_property_type_t type, 
-					void *value, int size)
+mtk_property_t *mtk_property_create(const char *name, const char *value)
 {
-	mtk_property_t *res;
+
+	mtk_property_t *res = NULL;
+	char *res_name = NULL;
+	char *res_value = NULL;
 	
 	res = malloc(sizeof(mtk_property_t));
 	if(res == NULL)
-		goto outA;
+		goto out;
 		
-	res->name = strdup(name);
-	if(res->name == NULL)
-		goto outB;
+	res_name = strdup(name);
+	if(res_name == NULL)
+		goto out;
 		
-	res->value = malloc(size);
-	if(res->value == NULL)
-		goto outC;
-	memcpy(res->value, value, size);
+	res_value = strdup(value);
+	if(res_value == NULL)
+		goto out;
 
-	res->type = type;
-	res->size = size;
+	res->name = res_name;
+	res->value = res_value;
 	
-outC:
-	free(res->name);
-outB:
+out:
+	free(res_name);
 	free(res);
-outA:
 	return NULL;
+
 }
 
 void mtk_property_destroy(mtk_property_t *property)
 {
+
 	if(property == NULL)
 		return;
 		
 	free(property->name);
 	free(property->value);
 	free(property);
+
+}
+
+mtk_property_t *mtk_property_copy(mtk_property_t *dest,
+	const mtk_property_t *src)
+{
+
+	char *name = NULL;
+	void *value = NULL;
+	
+	name = strdup(src->name);
+	if(name == NULL)
+		goto out;
+	value = strdup(src->value);
+	if(value == NULL)
+		goto out;
+		
+	dest->name = name;
+	dest->value = value;
+	
+	return dest;
+	
+out:
+	free(name);
+	return NULL;
+	
 }

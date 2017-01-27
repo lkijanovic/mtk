@@ -1,19 +1,15 @@
 #ifndef MTK_PROPERTY_H
 #define MTK_PROPERTY_H
 
-typedef enum mtk_property_type_t {
-	MTK_PROPERTY_TYPE_STRING,
-	MTK_PROPERTY_TYPE_INTEGER,
-	MTK_PROPERTY_TYPE_FLOAT,
-	MTK_PROPERTY_TYPE_BOOLEAN	
-} mtk_property_type_t;
-
 
 typedef struct mtk_property_t {
 	char *name;
-	void *value;
-	int size;
-	mtk_property_type_t type;
+	char *value;
 } mtk_property_t;
+
+mtk_property_t *mtk_property_create(const char *name, const char *value);
+void mtk_property_destroy(mtk_property_t *property);
+mtk_property_t *mtk_property_copy(mtk_property_t *dest,
+	const mtk_property_t *src);
 
 #endif

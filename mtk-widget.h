@@ -1,6 +1,8 @@
 #ifndef MTK_WIDGET_H
 #define MTK_WIDGET_H
 
+#include "mtk-list.h"
+
 
 typedef struct mtk_widget_t {
 	int id;

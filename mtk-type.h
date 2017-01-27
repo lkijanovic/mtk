@@ -1,9 +1,13 @@
 #ifndef MTK_TYPE_H
 #define MTK_TYPE_H
 
+#include "mtk-list.h"
+
 typedef struct mtk_type_t {
 	char *name;
 	int id;
+	mtk_list_t *properties;
+	mtk_list_t *events;
 } mtk_type_t;
 
 typedef struct mtk_type_list_t {
@@ -14,6 +18,8 @@ typedef struct mtk_type_list_t {
 
 
 mtk_type_t *mtk_type_create(const char *name);
+mtk_type_t *mtk_type_create_ext(const char *name, const mtk_list_t *properties,
+	const mtk_list_t *events);
 void mtk_type_destroy(mtk_type_t *type);
 mtk_type_t *mtk_type_copy(mtk_type_t *dest, const mtk_type_t *src);
 
