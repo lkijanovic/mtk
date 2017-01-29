@@ -95,13 +95,15 @@ int mtk_type_register(const char *name)
 	type = mtk_type_create(name);
 	if(type == NULL)
 		goto out;
+	if(mtk_list_search(data->types, type, mtk_type_compare_name) != NULL)
+		goto out;
 	if(!mtk_list_insert(data->types, type))
 		goto out;
 	mtk_type_destroy(type);
-	
+
 	return 1;
-	
-	
+
+
 out:
 	mtk_type_destroy(type);
 	return 0;
@@ -139,6 +141,9 @@ int mtk_property_register(const char *name, const char *value)
 	property = mtk_property_create(name, value);
 	if(property == NULL)
 		goto out;
+	if(mtk_list_search(data->properties, property, 
+		mtk_property_compare) != NULL)
+		goto out;
 	if(!mtk_list_insert(data->properties, property))
 		goto out;
 	mtk_property_destroy(property);
@@ -175,6 +180,8 @@ int mtk_event_register(const char *name, void (*callback)(void *))
 
 	event = mtk_event_create(name, callback);
 	if(event == NULL)
+		goto out;
+	if(mtk_list_search(data->events, event, mtk_event_compare) != NULL)
 		goto out;
 	if(!mtk_list_insert(data->events, event))
 		goto out;

@@ -19,8 +19,7 @@ mtk_type_t *mtk_type_create_ext(const char *name, const mtk_list_t *properties,
 	mtk_type_t *res = NULL;
 	char *res_name = NULL;
 	mtk_list_t *res_properties = NULL, *res_events = NULL;
-	
-	
+
 	res = malloc(sizeof(mtk_type_t));
 	if(res == NULL)
 		goto out;
@@ -48,11 +47,13 @@ out:
 	free(res_name);
 	free(res);
 	return NULL;
+	
 }
 
 
 
-void mtk_type_destroy(mtk_type_t *type) {
+void mtk_type_destroy(mtk_type_t *type)
+{
 
 	if(type == NULL)
 		return;
@@ -87,9 +88,24 @@ mtk_type_t *mtk_type_copy(mtk_type_t *dest, const mtk_type_t *src)
 
 	return dest;
 
+
 out:
 	mtk_list_destroy(properties);
 	free(name);
 	return NULL;
 	
+}
+
+int mtk_type_compare_name(const mtk_type_t *t1, const mtk_type_t *t2)
+{
+
+	return strcmp(t1->name, t2->name);
+	
+}
+
+int mtk_type_compare_id(const mtk_type_t *t1, const mtk_type_t *t2)
+{
+
+	return (t1->id - t2->id);
+
 }

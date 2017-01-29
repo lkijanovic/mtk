@@ -53,3 +53,10 @@ mtk_event_t *mtk_event_copy(mtk_event_t *dest, const mtk_event_t *src)
 	return dest;
 
 }
+
+int mtk_event_compare(const mtk_event_t *t1, const mtk_event_t *t2)
+{
+	
+	return strcmp(t1->name, t2->name);
+	
+}

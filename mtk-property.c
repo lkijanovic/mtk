@@ -68,3 +68,10 @@ out:
 	return NULL;
 	
 }
+
+int mtk_property_compare(const mtk_property_t *t1, const mtk_property_t *t2)
+{
+	
+	return strcmp(t1->name, t2->name);
+	
+}

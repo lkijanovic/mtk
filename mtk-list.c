@@ -129,6 +129,8 @@ const void *mtk_list_search(mtk_list_t *list, const void *data,
 			
 		if(t == 0)
 			return elem->data;
+			
+		elem = elem->next;
 	}
 	
 	return NULL;
