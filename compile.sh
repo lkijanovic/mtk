@@ -1,1 +1,1 @@
-gcc -o test *.c `pkg-config --cflags --libs cairo` -lxcb -Wextra -Wall -Wno-incompatible-pointer-types -g
+gcc -o test *.c `pkg-config --cflags --libs cairo` -lxcb -Wextra -Wall -Wno-incompatible-pointer-types -Wno-sign-compare -g

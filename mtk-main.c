@@ -34,7 +34,7 @@ int mtk_init()
 	/* populate type list with basic types */
 	if(!mtk_init_types())
 		goto out;
-		
+
 	data->xcb_conn = conn;
 	data->properties = NULL;
 	data->events = NULL;
@@ -48,7 +48,7 @@ out:
 	data = NULL;
 	xcb_disconnect(conn);
 	return 0;
-	
+
 }
 
 void mtk_exit()
@@ -62,22 +62,22 @@ void mtk_exit()
 	mtk_list_destroy(data->types);
 	free(data);
 	data = NULL;
-	
+
 }
 
 int mtk_init_types()
 {
-	
+
 	data->types = mtk_list_create_ext(sizeof(mtk_type_t), mtk_type_copy,
 		mtk_type_destroy);
 	if(data->types == NULL)
 		goto out;
-	
+
 	if(!mtk_type_register("mtk_blank"))
 		goto out;
 	if(!mtk_type_register("mtk_window"))
 		goto out;
-		
+
 	return 1;
 
 
@@ -85,13 +85,13 @@ out:
 	mtk_list_destroy(data->types);
 	data->types = NULL;
 	return 0;
-	
+
 }
 
 int mtk_type_register(const char *name)
 {
 	mtk_type_t *type = NULL;
-	
+
 	type = mtk_type_create(name);
 	if(type == NULL)
 		goto out;
@@ -107,17 +107,17 @@ int mtk_type_register(const char *name)
 out:
 	mtk_type_destroy(type);
 	return 0;
-	
+
 }
 
 int mtk_init_properties()
 {
-	
+
 	data->properties = mtk_list_create_ext(sizeof(mtk_property_t),
 		mtk_property_copy, mtk_property_destroy);
 	if(data->properties == NULL)
 		goto out;
-	
+
 	/* TODO: add other properties */
 	if(!mtk_property_register("bg-color", "white"))
 		goto out;
@@ -135,19 +135,19 @@ out:
 
 int mtk_property_register(const char *name, const char *value)
 {
-	
+
 	mtk_property_t *property = NULL;
 
 	property = mtk_property_create(name, value);
 	if(property == NULL)
 		goto out;
-	if(mtk_list_search(data->properties, property, 
+	if(mtk_list_search(data->properties, property,
 		mtk_property_compare) != NULL)
 		goto out;
 	if(!mtk_list_insert(data->properties, property))
 		goto out;
 	mtk_property_destroy(property);
-		
+
 out:
 	mtk_property_destroy(property);
 	return 0;
@@ -156,14 +156,14 @@ out:
 
 int mtk_init_events()
 {
-	
+
 	data->events = mtk_list_create_ext(sizeof(mtk_event_t),
 		mtk_event_copy, mtk_event_destroy);
 	if(data->events == NULL)
 		goto out;
-	
+
 	/* TODO: add some events later */
-	
+
 	return 1;
 
 
@@ -175,7 +175,7 @@ out:
 
 int mtk_event_register(const char *name, void (*callback)(void *))
 {
-	
+
 	mtk_event_t *event = NULL;
 
 	event = mtk_event_create(name, callback);
@@ -186,7 +186,7 @@ int mtk_event_register(const char *name, void (*callback)(void *))
 	if(!mtk_list_insert(data->events, event))
 		goto out;
 	mtk_event_destroy(event);
-		
+
 out:
 	mtk_event_destroy(event);
 	return 0;

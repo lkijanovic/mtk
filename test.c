@@ -22,9 +22,9 @@ int main(int argc, char **argv)
 
 	mtk_window_draw(win);*/
 
-	mtk_list_elem_t *elem;
-	for(elem = data->types->first; elem != NULL; elem = elem->next) {
-		mtk_type_t *type = (mtk_type_t *)elem->data;
+	mtk_list_node_t *node;
+	for(node = data->types->first; node != NULL; node = node->next) {
+		mtk_type_t *type = (mtk_type_t *)node->data;
 		printf("%s:%i\n", type->name, type->id);
 	}
 
