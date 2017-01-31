@@ -2,7 +2,7 @@
 #define MTK_ARRAY_H
 
 typedef struct mtk_array_t {
-	void *data;
+	void **data;
 	unsigned elem_size;
 	unsigned size;
 	unsigned alloc_size;

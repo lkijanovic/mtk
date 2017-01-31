@@ -16,12 +16,24 @@ mtk_array_t *mtk_array_create_ext(unsigned elem_size, unsigned alloc_size,
 	void (*destroy)(void *))
 {
 
-	mtk_array_t *res;
+	mtk_array_t *res = NULL;
+	void **res_data = NULL;
 
-	res = malloc(alloc_size * sizeof(elem_size));
+	res = malloc(sizeof(mtk_array_t));
 	if(res == NULL)
-		return NULL;
+		goto out;
 
+	res_data = calloc(alloc_size, sizeof(void *));
+	if(res_data == NULL)
+		goto out;
+
+	for(int i = 0; i < alloc_size; i++) {
+		res_data[i] = malloc(elem_size);
+		if(res_data[i] == NULL)
+			goto out;
+	}
+
+	res->data = res_data;
 	res->elem_size = elem_size;
 	res->alloc_size = alloc_size;
 	res->alloc_coeff = alloc_coeff;
@@ -31,6 +43,14 @@ mtk_array_t *mtk_array_create_ext(unsigned elem_size, unsigned alloc_size,
 
 	return res;
 
+
+out:
+	for(int i = 0; i < alloc_size; i++) {
+		free(res_data[i]);
+	}
+	free(res_data);
+	free(res);
+	return NULL;
 }
 
 void mtk_array_destroy(mtk_array_t *array)
@@ -49,33 +69,38 @@ void mtk_array_destroy(mtk_array_t *array)
 void *mtk_array_fetch(mtk_array_t *array, unsigned index)
 {
 
-	return array->data + array->elem_size * index;
+	return array->data[index];
 
 }
 
 int mtk_array_insert(mtk_array_t *array, const void *data)
 {
 
-	void *n_data, *elem;
+	void **n_data, *elem;
 	int n_alloc_size;
 
 	if(array->size >= array->alloc_size) {
-		n_alloc_size = array->alloc_size * array->elem_size;
-		n_alloc_size = (int)(n_alloc_size * array->alloc_coeff);
+		n_alloc_size = (int)(array->alloc_size * array->alloc_coeff);
 
-		n_data = realloc(array->data, n_alloc_size);
+		n_data = realloc(array->data, n_alloc_size * sizeof(void *));
 		if(n_data == NULL)
 			return 0;
-
+		
 		array->data = n_data;
 		array->alloc_size = n_alloc_size;
 	}
 
-	elem = mtk_array_fetch(array, array->size);
+	elem = malloc(array->elem_size);
+	if(elem == NULL)
+		return 0;
+
 	if(array->copy != NULL)
 		array->copy(elem, data);
 	else
 		memcpy(elem, data, array->elem_size);
+
+	array->data[array->size] = elem;
+	array->size += 1;
 
 	return 1;
 
@@ -116,14 +141,12 @@ mtk_array_t *mtk_array_copy(mtk_array_t *array)
 	if(res == NULL)
 		return NULL;
 
-	if(array->copy != NULL) {
-		for(int i = 0; i < array->size; i++) {
-			elem = mtk_array_fetch(array, i);
-			array->copy(res->data + array->elem_size * i, elem);
-		}
-	} else {
-		memcpy(res->data, array->data, array->elem_size * array->size);
-	}
+	for(int i = 0; i < array->size; i++) {
+		elem = mtk_array_fetch(array, i);
+		if(array->copy != NULL)
+			array->copy(res->data[i], elem);
+		else
+			memcpy(res->data[i], elem, array->elem_size);
 
 	return res;
 
