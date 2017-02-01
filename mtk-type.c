@@ -66,27 +66,33 @@ void mtk_type_destroy(mtk_type_t *type)
 }
 
 
-mtk_type_t *mtk_type_copy(mtk_type_t *dest, const mtk_type_t *src)
+mtk_type_t *mtk_type_copy(const mtk_type_t *type)
 {
+
+	mtk_type_t *res = NULL;
 	char *name = NULL;
 	mtk_list_t *properties = NULL, *events = NULL;	
 
-	name = strdup(src->name);
+	res = malloc(sizeof(mtk_type_t));
+	if(res == NULL)
+		goto out;
+
+	name = strdup(type->name);
 	if(name == NULL)
 		goto out;
-	properties = mtk_list_copy(src->properties);
-	if(properties == NULL && src->properties != NULL)
+	properties = mtk_list_copy(type->properties);
+	if(properties == NULL && type->properties != NULL)
 		goto out;
-	events = mtk_list_copy(src->events);
-	if(events == NULL && src->events != NULL)
+	events = mtk_list_copy(type->events);
+	if(events == NULL && type->events != NULL)
 		goto out;
 
-	dest->name = name;
-	dest->properties = properties;
-	dest->events = events;
-	dest->id = src->id;
+	res->name = name;
+	res->properties = properties;
+	res->events = events;
+	res->id = type->id;
 
-	return dest;
+	return res;
 
 
 out:

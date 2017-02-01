@@ -39,18 +39,27 @@ void mtk_event_destroy(mtk_event_t *event)
 
 }
 
-mtk_event_t *mtk_event_copy(mtk_event_t *dest, const mtk_event_t *src)
+mtk_event_t *mtk_event_copy(const mtk_event_t *event)
 {
+	mtk_event_t *res = NULL;
+	char *name;
 
-	char *name = NULL;
+	res = malloc(sizeof(mtk_event_t));
+	if(res == NULL)
+		goto out;
 
-	name = strdup(src->name);
+	name = strdup(event->name);
 	if(name == NULL)
-		return NULL;
+		goto out;
 
-	dest->name = name;
-	dest->callback = src->callback;
-	return dest;
+	res->name = name;
+	res->callback = event->callback;
+	return res;
+
+
+out:
+	free(res);
+	return NULL;
 
 }
 

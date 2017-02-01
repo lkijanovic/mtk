@@ -44,27 +44,31 @@ void mtk_property_destroy(mtk_property_t *property)
 
 }
 
-mtk_property_t *mtk_property_copy(mtk_property_t *dest,
-	const mtk_property_t *src)
+mtk_property_t *mtk_property_copy(const mtk_property_t *property)
 {
 
-	char *name = NULL;
-	void *value = NULL;
+	mtk_property_t *res = NULL;
+	char *name = NULL, *value = NULL;
 
-	name = strdup(src->name);
+	res = malloc(sizeof(mtk_property_t));
+	if(res == NULL)
+		goto out;
+
+	name = strdup(property->name);
 	if(name == NULL)
 		goto out;
-	value = strdup(src->value);
+	value = strdup(property->value);
 	if(value == NULL)
 		goto out;
 
-	dest->name = name;
-	dest->value = value;
+	res->name = name;
+	res->value = value;
 
-	return dest;
+	return res;
 
 
 out:
+	free(res);
 	free(name);
 	return NULL;
 

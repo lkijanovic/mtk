@@ -11,8 +11,8 @@ mtk_hashtab_t *mtk_hashtab_create(unsigned elem_size)
 }
 
 mtk_hashtab_t *mtk_hashtab_create_ext(unsigned elem_size, unsigned bucket_size,
-	unsigned (*hash)(const char *, unsigned), 
-	void *(*copy)(void *, const void *), void (*destroy)(void *))
+	unsigned (*hash)(const char *, unsigned), void *(*copy)(const void *), 
+	void (*destroy)(void *))
 {
 
 	mtk_hashtab_t *res;
@@ -29,7 +29,7 @@ mtk_hashtab_t *mtk_hashtab_create_ext(unsigned elem_size, unsigned bucket_size,
 		goto out;
 
 	for(int i = 0; i < bucket_size; i++) {
-		bucket = mtk_list_create(elem_size);
+		bucket = mtk_list_create_ext(elem_size, copy, destroy);
 		if(bucket == NULL)
 			goto out;
 		if(!mtk_array_insert(buckets, bucket))
@@ -59,7 +59,7 @@ out:
 void mtk_hashtab_destroy(mtk_hashtab_t *hashtab)
 {
 
-	mtk_array_destroy(buckets);
+	mtk_array_destroy(hashtab->buckets);
 	free(hashtab);
 
 }
@@ -67,14 +67,21 @@ void mtk_hashtab_destroy(mtk_hashtab_t *hashtab)
 mtk_hashtab_t *mtk_hashtab_copy(mtk_hashtab_t *hashtab)
 {
 
-	mtk_hashtab_t *res;
-	mtk_list_t **bucket;
+	mtk_hashtab_t *res = NULL;
 
 	res = mtk_hashtab_create_ext(hashtab->elem_size, hashtab->bucket_size,
 		hashtab->hash, hashtab->copy, hashtab->destroy);
 	if(res == NULL)
-		return NULL;
+		goto out;
 
-	/* TODO: finish this up */
+	res->buckets = mtk_array_copy(hashtab->buckets);
+	if(res->buckets == NULL)
+		goto out;
+	res->size = hashtab->size;
 
+	return res;
+
+out:
+	mtk_hashtab_destroy(res);
+	return NULL;
 }

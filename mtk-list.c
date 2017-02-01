@@ -12,14 +12,16 @@ mtk_list_node_t *mtk_list_node_create(const mtk_list_t *list, const void *data)
 	if(res == NULL)
 		goto out;
 
-	res->data = malloc(list->elem_size);
-	if(res->data == NULL)
-		goto out;
-
-	if(list->copy != NULL)
-		list->copy(res->data, data);
-	else
+	if(list->copy != NULL) {
+		res->data = list->copy(data);
+		if(res->data == NULL)
+			goto out;
+	} else {
+		res->data = malloc(list->elem_size);
+		if(res->data == NULL)
+			goto out;
 		memcpy(res->data, data, list->elem_size);
+	}
 
 	res->next = NULL;
 	return res;
@@ -53,8 +55,7 @@ mtk_list_t *mtk_list_create(unsigned elem_size)
 
 }
 
-mtk_list_t *mtk_list_create_ext(unsigned elem_size,
-	void *(*copy)(void *, const void *),
+mtk_list_t *mtk_list_create_ext(unsigned elem_size, void *(*copy)(const void *),
 	void (*destroy)(void *))
 {
 
