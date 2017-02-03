@@ -1,12 +1,17 @@
 #include <stdlib.h>
 #include <stdio.h>
+#include <string.h>
 #include <xcb/xcb.h>
 
 #include "mtk-main.h"
 #include "mtk-type.h"
 #include "mtk-window.h"
 
+#include "mtk-array.h"
+#include "mtk-hashtab.h"
+
 extern mtk_data_t *data;
+
 
 int main(int argc, char **argv)
 {
@@ -27,6 +32,8 @@ int main(int argc, char **argv)
 		mtk_type_t *type = (mtk_type_t *)node->data;
 		printf("%s:%i\n", type->name, type->id);
 	}
+
+
 
 	mtk_exit();
 

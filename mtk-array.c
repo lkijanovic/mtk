@@ -30,9 +30,6 @@ mtk_array_t *mtk_array_create_ext(unsigned elem_size, unsigned alloc_size,
 	if(res_data == NULL)
 		goto out;
 
-	for(int i = 0; i < alloc_size; i++) {
-		res_data[i] = NULL;
-	}
 
 	res->data = res_data;
 	res->elem_size = elem_size;
@@ -46,10 +43,6 @@ mtk_array_t *mtk_array_create_ext(unsigned elem_size, unsigned alloc_size,
 
 
 out:
-	for(int i = 0; i < alloc_size; i++) {
-		free(res_data[i]);
-	}
-	free(res_data);
 	free(res);
 	return NULL;
 }
@@ -57,10 +50,14 @@ out:
 void mtk_array_destroy(mtk_array_t *array)
 {
 
-	if(array->destroy != NULL)
+	if(array == NULL)
+		return;
+
+	if(array->destroy != NULL) {
 		for(int i = 0; i < array->size; i++) {
 			array->destroy(mtk_array_fetch(array, i));
 		}
+	}
 
 	free(array->data);
 	free(array);
@@ -107,7 +104,7 @@ int mtk_array_insert(mtk_array_t *array, const void *data)
 
 	void *elem;
 
-	while(array->size >= array->alloc_size) {
+	if(array->size >= array->alloc_size) {
 		if(!mtk_array_grow(array))
 			return 0;
 	}
@@ -161,6 +158,9 @@ int mtk_array_grow(mtk_array_t *array)
 	void **n_data;
 
 	n_alloc_size = (unsigned)(array->alloc_size * array->alloc_coeff);
+	if(n_alloc_size == array->alloc_size)
+		n_alloc_size = n_alloc_size + 1;
+
 	n_data = realloc(array->data, n_alloc_size * sizeof(void *));
 	if(n_data == NULL)
 		return 0;

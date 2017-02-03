@@ -19,5 +19,8 @@ mtk_hashtab_t *mtk_hashtab_create_ext(unsigned elem_size, unsigned bucket_size,
 	void (*destroy)(void *));
 void mtk_hashtab_destroy(mtk_hashtab_t *hashtab);
 mtk_hashtab_t *mtk_hashtab_copy(mtk_hashtab_t *hashtab);
+int mtk_hashtab_insert(mtk_hashtab_t *hashtab, const void *data);
+const void *mtk_hashtab_search(mtk_hashtab_t *hashtab, const void *data,
+	int (*compare)(const void *, const void *));
 
 #endif

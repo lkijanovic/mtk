@@ -94,9 +94,10 @@ void mtk_list_destroy(mtk_list_t *list)
 
 }
 
+
 const void *mtk_list_fetch(mtk_list_t *list, unsigned index)
 {
-
+	/* TODO: find constant time solution (iterators or something) */
 	mtk_list_node_t *node;
 
 	node = list->first;
