@@ -25,6 +25,8 @@ mtk_property_t *mtk_property_create(const char *name, const char *value)
 	res->name = res_name;
 	res->value = res_value;
 
+	return res;
+
 out:
 	free(res_name);
 	free(res);

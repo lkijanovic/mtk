@@ -94,6 +94,12 @@ void mtk_list_destroy(mtk_list_t *list)
 
 }
 
+unsigned mtk_list_size(mtk_list_t *list)
+{
+
+	return list->size;
+
+}
 
 const void *mtk_list_fetch(mtk_list_t *list, unsigned index)
 {

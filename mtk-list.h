@@ -25,6 +25,7 @@ mtk_list_t *mtk_list_create_ext(unsigned elem_size, void *(*copy)(const void *),
 	void (*destroy)(void *));
 void mtk_list_destroy(mtk_list_t *list);
 mtk_list_t *mtk_list_copy(const mtk_list_t *list);
+unsigned mtk_list_size(mtk_list_t *list);
 const void *mtk_list_fetch(mtk_list_t *list, unsigned index);
 int mtk_list_insert(mtk_list_t *list, const void *data);
 const void *mtk_list_search(mtk_list_t *list, const void *data,

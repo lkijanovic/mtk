@@ -92,6 +92,13 @@ out:
 
 }
 
+unsigned mtk_array_size(mtk_array_t *array)
+{
+
+	return array->size;
+
+}
+
 void *mtk_array_fetch(mtk_array_t *array, unsigned index)
 {
 

@@ -62,6 +62,9 @@ out:
 void mtk_hashtab_destroy(mtk_hashtab_t *hashtab)
 {
 
+	if(hashtab == NULL)
+		return;
+
 	mtk_array_destroy(hashtab->buckets);
 	free(hashtab);
 

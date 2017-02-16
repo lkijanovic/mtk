@@ -15,7 +15,7 @@ mtk_widget_t *mtk_widget_create(const char *name, const char *type_name)
 	char *res_name = NULL;
 	const mtk_type_t *type;
 	mtk_type_t *t = NULL;
-	int type_id;
+	unsigned type_id;
 
 	res = malloc(sizeof(mtk_widget_t));
 	if(res == NULL)
@@ -64,5 +64,44 @@ void mtk_widget_destroy(mtk_widget_t *widget)
 	free(widget->name);
 	mtk_list_destroy(widget->properties);
 	mtk_list_destroy(widget->events);
+
+}
+
+
+const mtk_property_t *mtk_widget_get_property(mtk_widget_t *widget, 
+	const char *name)
+{
+
+	mtk_property_t *t;
+	const mtk_property_t *loc_res, *typ_res, *glb_res, *res;
+	mtk_type_t *type = NULL;
+
+	t = mtk_property_create(name, "");
+	if(t == NULL)
+		goto out;
+
+	if(widget->type_id < mtk_array_size(data->types))
+		type = mtk_array_fetch(data->types, widget->type_id);
+	if(type == NULL)
+		goto out;
+	
+	loc_res = mtk_list_search(widget->properties, t, mtk_property_compare);
+	typ_res = mtk_list_search(type->properties, t, mtk_property_compare);
+	glb_res = mtk_hashtab_search(data->properties, t, mtk_property_compare);
+
+	if(loc_res != NULL)
+		res = loc_res;
+	else if(typ_res != NULL)
+		res = typ_res;
+	else
+		res = glb_res;
+
+	mtk_property_destroy(t);
+	return res;
+
+
+out:
+	mtk_property_destroy(t);
+	return NULL;
 
 }

@@ -30,20 +30,30 @@ int mtk_init()
 	data = malloc(sizeof(mtk_data_t));
 	if(data == NULL)
 		goto out;
+	data->types = NULL;
+	data->properties = NULL;
+	data->events = NULL;
 
-	/* populate type list with basic types */
+	/* populate type array with basic types */
 	if(!mtk_init_types())
+		goto out;
+	/* populate event and property tables */
+	if(!mtk_init_properties())
+		goto out;
+	if(!mtk_init_events())
 		goto out;
 
 	data->xcb_conn = conn;
-	data->properties = NULL;
-	data->events = NULL;
 
 	/* return 1 on success */
 	return 1;
 
 
 out:
+	mtk_hashtab_destroy(data->properties);
+	data->properties = NULL;
+	mtk_array_destroy(data->types);
+	data->types = NULL;
 	free(data);
 	data = NULL;
 	xcb_disconnect(conn);
@@ -59,7 +69,10 @@ void mtk_exit()
 
 	/* disconnect from X server and free allocated data */
 	xcb_disconnect(data->xcb_conn);
-	mtk_list_destroy(data->types);
+	mtk_hashtab_destroy(data->events);
+	mtk_hashtab_destroy(data->properties);
+	mtk_array_destroy(data->types);
+
 	free(data);
 	data = NULL;
 
@@ -68,8 +81,8 @@ void mtk_exit()
 int mtk_init_types()
 {
 
-	data->types = mtk_list_create_ext(sizeof(mtk_type_t), mtk_type_copy,
-		mtk_type_destroy);
+	data->types = mtk_array_create_ext(sizeof(mtk_type_t), 100, 1.5, 
+		mtk_type_copy, mtk_type_destroy);
 	if(data->types == NULL)
 		goto out;
 
@@ -82,7 +95,7 @@ int mtk_init_types()
 
 
 out:
-	mtk_list_destroy(data->types);
+	mtk_array_destroy(data->types);
 	data->types = NULL;
 	return 0;
 
@@ -95,9 +108,9 @@ int mtk_type_register(const char *name)
 	type = mtk_type_create(name);
 	if(type == NULL)
 		goto out;
-	if(mtk_list_search(data->types, type, mtk_type_compare_name) != NULL)
+	if(mtk_array_search(data->types, type, mtk_type_compare_name) != NULL)
 		goto out;
-	if(!mtk_list_insert(data->types, type))
+	if(!mtk_array_insert(data->types, type))
 		goto out;
 	mtk_type_destroy(type);
 
@@ -113,8 +126,8 @@ out:
 int mtk_init_properties()
 {
 
-	data->properties = mtk_list_create_ext(sizeof(mtk_property_t),
-		mtk_property_copy, mtk_property_destroy);
+	data->properties = mtk_hashtab_create_ext(sizeof(mtk_property_t), 1024,
+		NULL, mtk_property_copy, mtk_property_destroy);
 	if(data->properties == NULL)
 		goto out;
 
@@ -123,12 +136,16 @@ int mtk_init_properties()
 		goto out;
 	if(!mtk_property_register("fg-color", "black"))
 		goto out;
-
+	if(!mtk_property_register("width", "200"))
+		goto out;
+	if(!mtk_property_register("height", "200"))
+		goto out;
 	return 1;
 
 
 out:
-	mtk_list_destroy(data->properties);
+	mtk_hashtab_destroy(data->properties);
+	data->properties = NULL;
 	return 0;
 
 }
@@ -141,12 +158,14 @@ int mtk_property_register(const char *name, const char *value)
 	property = mtk_property_create(name, value);
 	if(property == NULL)
 		goto out;
-	if(mtk_list_search(data->properties, property,
+	if(mtk_hashtab_search(data->properties, property,
 		mtk_property_compare) != NULL)
 		goto out;
-	if(!mtk_list_insert(data->properties, property))
+	if(!mtk_hashtab_insert(data->properties, property))
 		goto out;
 	mtk_property_destroy(property);
+
+	return 1;
 
 out:
 	mtk_property_destroy(property);
@@ -157,7 +176,7 @@ out:
 int mtk_init_events()
 {
 
-	data->events = mtk_list_create_ext(sizeof(mtk_event_t),
+	data->events = mtk_hashtab_create_ext(sizeof(mtk_event_t), 1024, NULL, 
 		mtk_event_copy, mtk_event_destroy);
 	if(data->events == NULL)
 		goto out;
@@ -168,7 +187,8 @@ int mtk_init_events()
 
 
 out:
-	mtk_list_destroy(data->events);
+	mtk_hashtab_destroy(data->events);
+	data->events = NULL;
 	return 0;
 
 }
@@ -181,11 +201,13 @@ int mtk_event_register(const char *name, void (*callback)(void *))
 	event = mtk_event_create(name, callback);
 	if(event == NULL)
 		goto out;
-	if(mtk_list_search(data->events, event, mtk_event_compare) != NULL)
+	if(mtk_hashtab_search(data->events, event, mtk_event_compare) != NULL)
 		goto out;
-	if(!mtk_list_insert(data->events, event))
+	if(!mtk_hashtab_insert(data->events, event))
 		goto out;
 	mtk_event_destroy(event);
+
+	return 1;
 
 out:
 	mtk_event_destroy(event);
