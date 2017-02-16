@@ -30,7 +30,6 @@ mtk_array_t *mtk_array_create_ext(unsigned elem_size, unsigned alloc_size,
 	if(res_data == NULL)
 		goto out;
 
-
 	res->data = res_data;
 	res->elem_size = elem_size;
 	res->alloc_size = alloc_size;
@@ -111,7 +110,7 @@ int mtk_array_insert(mtk_array_t *array, const void *data)
 
 	void *elem;
 
-	if(array->size >= array->alloc_size) {
+	if(array->size >= array->alloc_size - 1) {
 		if(!mtk_array_grow(array))
 			return 0;
 	}
@@ -128,6 +127,7 @@ int mtk_array_insert(mtk_array_t *array, const void *data)
 	}
 
 	array->data[array->size] = elem;
+	array->data[array->size + 1] = NULL;
 	array->size += 1;
 
 	return 1;

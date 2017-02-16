@@ -140,6 +140,8 @@ int mtk_init_properties()
 		goto out;
 	if(!mtk_property_register("height", "200"))
 		goto out;
+	if(!mtk_property_register("position", "absolute"))
+		goto out;
 	return 1;
 
 
